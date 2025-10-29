@@ -1,0 +1,70 @@
+@Metadata.layer: #CORE
+
+@UI: {
+  headerInfo: { typeName: 'Item',
+                typeNamePlural: 'Item',
+                title: { type: #STANDARD,
+                         value: 'Posnr' } } }
+
+annotate entity zum_c_so_item with
+{
+
+  @UI.facet: [ { id:            'Item',
+                   purpose:       #STANDARD,
+                   type:          #IDENTIFICATION_REFERENCE,
+                   label:         'Item Details',
+                   position:      10 } ]
+
+  @UI: { lineItem:       [ { position: 20,
+                               importance: #HIGH } ],
+           identification: [ { position: 20 } ] }
+  Vbeln;
+
+  @UI: { lineItem:       [ { position: 30,
+                             importance: #HIGH } ],
+         identification: [ { position: 30 } ] }
+  Posnr;
+
+  @UI: { lineItem:       [ { position: 40,
+                             importance: #HIGH } ],
+         identification: [ { position: 40 } ] }
+  Matnr;
+
+  @UI: { lineItem:       [ { position: 50,
+                             importance: #HIGH } ],
+         identification: [ { position: 50 } ] }
+  Matkl;
+
+  @UI: { lineItem:       [ { position: 60,
+                             importance: #HIGH } ],
+         identification: [ { position: 60 } ] }
+  Pstyv;
+
+  @UI: { lineItem:       [ { position: 70,
+                             importance: #HIGH } ],
+         identification: [ { position: 70 } ] }
+  Posar;
+
+  @UI: { lineItem:       [ { position: 80,
+                             importance: #HIGH } ],
+         identification: [ { position: 80 } ] }
+  ProcessCode;
+
+  @UI.hidden: true
+  Createdby;
+
+  @UI.hidden: true
+  Createdat;
+
+  @UI.hidden: true
+  Lastchangedby;
+
+  @UI.hidden: true
+  Lastchangedat;
+
+  @UI.hidden: true
+  Locallastchangedat;
+  /* Associations */
+  //_Head;
+
+}
