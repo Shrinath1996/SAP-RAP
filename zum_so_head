@@ -1,0 +1,22 @@
+@EndUserText.label : 'Sales Order Header'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zum_so_head {
+
+  key client         : abap.clnt not null;
+  key vbeln          : vbeln_va not null;
+  vbtyp              : vbtypl;
+  auart              : auart;
+  augru              : augru;
+  vkorg              : vkorg;
+  vtweg              : vtweg;
+  spart              : spart;
+  createdby          : abp_creation_user;
+  createdat          : abp_creation_date;
+  lastchangedby      : abp_lastchange_user;
+  lastchangedat      : abp_lastchange_date;
+  locallastchangedat : abp_locinst_lastchange_date;
+
+}
