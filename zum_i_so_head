@@ -1,0 +1,21 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Int Sales Order Header'
+@Metadata.ignorePropagatedAnnotations: true
+define root view entity zum_i_so_head
+  as select from zum_so_head as Head
+  composition [0..*] of zum_i_so_item as _Item
+{
+  key vbeln              as Vbeln,
+      vbtyp              as Vbtyp,
+      auart              as Auart,
+      augru              as Augru,
+      vkorg              as Vkorg,
+      vtweg              as Vtweg,
+      spart              as Spart,
+      createdby          as Createdby,
+      createdat          as Createdat,
+      lastchangedby      as Lastchangedby,
+      lastchangedat      as Lastchangedat,
+      locallastchangedat as Locallastchangedat,
+      _Item
+}
