@@ -1,0 +1,24 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Comp Sales Order Header'
+@Metadata.allowExtensions: true
+//@Search.searchable: true
+define root view entity zum_c_so_head
+  provider contract transactional_query
+  as projection on zum_i_so_head
+  //composition[*] of child
+{
+  key Vbeln,
+      Vbtyp,
+      Auart,
+      Augru,
+      Vkorg,
+      Vtweg,
+      Spart,
+      Createdby,
+      Createdat,
+      Lastchangedby,
+      Lastchangedat,
+      Locallastchangedat,
+      /* Associations */
+      _Item : redirected to composition child zum_c_so_item
+}
