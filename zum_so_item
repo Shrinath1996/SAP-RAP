@@ -1,0 +1,22 @@
+@EndUserText.label : 'Sales Order Item'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zum_so_item {
+
+  key client         : abap.clnt not null;
+  key vbeln          : vbeln_va not null;
+  key posnr          : posnr_va not null;
+  matnr              : matnr;
+  matkl              : matkl;
+  pstyv              : pstyv;
+  posar              : posar;
+  process_code       : tdd_item_process_code;
+  createdby          : abp_creation_user;
+  createdat          : abp_creation_date;
+  lastchangedby      : abp_lastchange_user;
+  lastchangedat      : abp_lastchange_date;
+  locallastchangedat : abp_locinst_lastchange_date;
+
+}
