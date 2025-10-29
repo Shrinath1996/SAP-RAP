@@ -1,0 +1,22 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Comp Sales Order Item'
+@Metadata.allowExtensions: true
+
+define view entity zum_c_so_item
+  as projection on zum_i_so_item
+{
+  key Vbeln,
+  key Posnr,
+      Matnr,
+      Matkl,
+      Pstyv,
+      Posar,
+      ProcessCode,
+      Createdby,
+      Createdat,
+      Lastchangedby,
+      Lastchangedat,
+      Locallastchangedat,
+      /* Associations */
+      _Head : redirected to parent zum_c_so_head
+}
