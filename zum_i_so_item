@@ -1,0 +1,21 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Int Sales Order Item'
+@Metadata.ignorePropagatedAnnotations: true
+define view entity zum_i_so_item
+  as select from zum_so_item as Item
+  association to parent zum_i_so_head as _Head on $projection.Vbeln = _Head.Vbeln
+{
+  key vbeln              as Vbeln,
+  key posnr              as Posnr,
+      matnr              as Matnr,
+      matkl              as Matkl,
+      pstyv              as Pstyv,
+      posar              as Posar,
+      process_code       as ProcessCode,
+      createdby          as Createdby,
+      createdat          as Createdat,
+      lastchangedby      as Lastchangedby,
+      lastchangedat      as Lastchangedat,
+      locallastchangedat as Locallastchangedat,
+      _Head // Make association public
+}
