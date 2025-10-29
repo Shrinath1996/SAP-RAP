@@ -1,0 +1,17 @@
+@EndUserText.label : 'Control Structure SO Header'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+define structure zcs_sale_ord_hd {
+
+  vbtyp              : xsdboolean;
+  auart              : xsdboolean;
+  augru              : xsdboolean;
+  vkorg              : xsdboolean;
+  vtweg              : xsdboolean;
+  spart              : xsdboolean;
+  createdby          : xsdboolean;
+  createdat          : xsdboolean;
+  lastchangedby      : xsdboolean;
+  lastchangedat      : xsdboolean;
+  locallastchangedat : xsdboolean;
+
+}
