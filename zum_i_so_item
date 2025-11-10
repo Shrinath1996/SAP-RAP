@@ -12,10 +12,10 @@ define view entity zum_i_so_item
       pstyv              as Pstyv,
       posar              as Posar,
       process_code       as ProcessCode,
-      createdby          as Createdby,
-      createdat          as Createdat,
-      lastchangedby      as Lastchangedby,
-      lastchangedat      as Lastchangedat,
-      locallastchangedat as Locallastchangedat,
+      createdby          as Createdby1,
+      createdat          as Createdat1,
+      lastchangedby      as Lastchangedby1,
+      lastchangedat      as Lastchangedat1,
+      locallastchangedat as Locallastchangedat1,
       _Head // Make association public
 }
