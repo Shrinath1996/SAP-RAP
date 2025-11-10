@@ -1,0 +1,18 @@
+@EndUserText.label : 'Control Structure SO Item'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+define structure zcs_sale_ord_it {
+
+  vbeln              : xsdboolean;
+  posnr              : xsdboolean;
+  matnr              : xsdboolean;
+  matkl              : xsdboolean;
+  pstyv              : xsdboolean;
+  posar              : xsdboolean;
+  process_code       : xsdboolean;
+  createdby          : xsdboolean;
+  createdat          : xsdboolean;
+  lastchangedby      : xsdboolean;
+  lastchangedat      : xsdboolean;
+  locallastchangedat : xsdboolean;
+
+}
