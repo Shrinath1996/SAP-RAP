@@ -12,11 +12,11 @@ define view entity zum_c_so_item
       Pstyv,
       Posar,
       ProcessCode,
-      Createdby,
-      Createdat,
-      Lastchangedby,
-      Lastchangedat,
-      Locallastchangedat,
+      Createdby1,
+      Createdat1,
+      Lastchangedby1,
+      Lastchangedat1,
+      Locallastchangedat1,
       /* Associations */
       _Head : redirected to parent zum_c_so_head
 }
