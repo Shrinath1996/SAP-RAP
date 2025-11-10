@@ -5,19 +5,19 @@
 @AbapCatalog.dataMaintenance : #RESTRICTED
 define table zum_so_d_head {
 
-  key mandt          : mandt not null;
-  key vbeln          : vbeln_va not null;
-  vbtyp              : vbtypl;
-  auart              : auart;
-  augru              : augru;
-  vkorg              : vkorg;
-  vtweg              : vtweg;
-  spart              : spart;
-  createdby          : abp_creation_user;
-  createdat          : abp_creation_date;
-  lastchangedby      : abp_lastchange_user;
-  lastchangedat      : abp_lastchange_date;
-  locallastchangedat : abp_locinst_lastchange_date;
-  "%admin"           : include sych_bdl_draft_admin_inc;
+  key mandt           : mandt not null;
+  key vbeln           : vbeln_va not null;
+  vbtyp               : vbtypl;
+  auart               : auart;
+  augru               : augru;
+  vkorg               : vkorg;
+  vtweg               : vtweg;
+  spart               : spart;
+  created_by          : abp_creation_user;
+  created_at          : abp_creation_date;
+  lastchanged_by      : abp_lastchange_user;
+  lastchanged_at      : abp_lastchange_date;
+  locallastchanged_at : abp_locinst_lastchange_date;
+  "%admin"            : include sych_bdl_draft_admin_inc;
 
 }
