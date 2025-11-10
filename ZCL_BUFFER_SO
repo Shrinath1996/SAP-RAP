@@ -1,0 +1,344 @@
+CLASS zcl_buffer_so DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    CLASS-METHODS get_instance RETURNING VALUE(ro_instance) TYPE REF TO zcl_buffer_so.
+
+    TYPES: tt_create_head        TYPE TABLE FOR CREATE zum_i_so_head\\head,
+           tt_read_head          TYPE TABLE FOR READ IMPORT zum_i_so_head\\head,
+           tt_read_result        TYPE TABLE FOR READ RESULT zum_i_so_head\\head,
+           tt_update_head        TYPE TABLE FOR UPDATE zum_i_so_head\\head,
+           tt_update_item        TYPE TABLE FOR UPDATE zum_i_so_head\\item,
+           tt_delete_head        TYPE TABLE FOR DELETE zum_i_so_head\\head,
+           tt_delete_item        TYPE TABLE FOR DELETE zum_i_so_head\\item,
+           tt_read_head_item     TYPE TABLE FOR READ IMPORT zum_i_so_head\\head\_item,
+           tt_read_result_hd_itm TYPE TABLE FOR READ RESULT zum_i_so_head\\head\_item,
+           tt_crte_hd_item       TYPE TABLE FOR CREATE zum_i_so_head\\head\_item,
+           tt_read_link_hd_itm   TYPE TABLE FOR READ LINK zum_i_so_head\\head\_item,
+           tt_mapped_early       TYPE RESPONSE FOR MAPPED EARLY zum_i_so_head,
+           tt_resp_fail_early    TYPE RESPONSE FOR FAILED EARLY zum_i_so_head,
+           tt_reported_late      TYPE RESPONSE FOR REPORTED LATE zum_i_so_head,
+           tt_reported_early     TYPE RESPONSE FOR REPORTED EARLY zum_i_so_head.
+
+    METHODS: earlynumbering_create_head
+      IMPORTING entities TYPE tt_create_head     "table for CREATE zum_i_so_head\\_head
+      CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      create_head
+        IMPORTING entities TYPE tt_create_head      "table for create zum_i_so_head\\_head
+        CHANGING  mapped   TYPE tt_mapped_early     "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early  "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early,  "response for reported early zum_i_so_head
+
+      read_head
+        IMPORTING keys     TYPE tt_read_head       "type table for read import zum_i_so_head\\head
+        CHANGING  result   TYPE tt_read_result     "table for read result zum_i_so_head\\head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      update_head
+        IMPORTING entities TYPE tt_update_head     "table for update zum_i_so_head\\head
+        CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      delete_head
+        IMPORTING keys     TYPE tt_delete_head     "table for delete zum_i_so_head\\head
+        CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      delete_item
+        IMPORTING keys     TYPE tt_delete_item     "table for delete zum_i_so_head\\item
+        CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      update_item
+        IMPORTING entities TYPE tt_update_item     "table for update zum_i_so_head\\item
+        CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      rba_item
+        IMPORTING keys_rba          TYPE tt_read_head_item     "table for read import zum_i_so_head\\head\_item
+                  result_requested  TYPE char1
+        CHANGING  result            TYPE tt_read_result_hd_itm "table for read result zum_i_so_head\\head\_item
+                  association_links TYPE tt_read_link_hd_itm   "table for read link zum_i_so_head\\head\_item
+                  failed            TYPE tt_resp_fail_early    "response for failed early zum_i_so_head
+                  reported          TYPE tt_reported_early,    "response for reported early zum_i_so_head
+
+      cba_item
+        IMPORTING entities_cba TYPE tt_crte_hd_item    "table for create zum_i_so_head\\head\_item
+        CHANGING  mapped       TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed       TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported     TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      earlynumbering_cba_item
+        IMPORTING entities TYPE tt_crte_hd_item    "table for create zum_i_so_head\\head\_item
+        CHANGING  mapped   TYPE tt_mapped_early    "response for mapped early zum_i_so_head
+                  failed   TYPE tt_resp_fail_early "response for failed early zum_i_so_head
+                  reported TYPE tt_reported_early, "response for reported early zum_i_so_head
+
+      save_data
+        CHANGING reported TYPE tt_reported_late.   "response for reported late zum_i_so_head
+
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+    CLASS-DATA: mo_instance TYPE REF TO zcl_buffer_so,
+                gt_so_head  TYPE STANDARD TABLE OF zum_so_head,
+                gr_head_d   TYPE RANGE OF zum_so_head-vbeln,
+                gr_item_d   TYPE STANDARD TABLE OF zum_so_item,
+                gt_so_item  TYPE STANDARD TABLE OF zum_so_item.
+
+ENDCLASS.
+
+
+
+CLASS zcl_buffer_so IMPLEMENTATION.
+
+  METHOD get_instance.
+
+    mo_instance = ro_instance = COND #( WHEN mo_instance IS BOUND
+                                        THEN mo_instance
+                                        ELSE NEW #(  )  ).
+
+  ENDMETHOD.
+
+
+  METHOD earlynumbering_create_head.
+
+    SELECT MAX( vbeln ) FROM zum_so_head
+    INTO @DATA(lv_vbeln).
+
+    lv_vbeln = lv_vbeln + 1.
+
+    lv_vbeln = |{ lv_vbeln ALPHA = IN }|.
+
+    mapped-head = VALUE #( FOR ls_entities IN entities WHERE ( vbeln IS INITIAL )
+    ( %cid      = ls_entities-%cid
+      %is_draft = ls_entities-%is_draft
+      vbeln     = lv_vbeln ) ).
+
+    CLEAR lv_vbeln.
+
+  ENDMETHOD.
+
+  METHOD create_head.
+    gt_so_head = CORRESPONDING #( entities MAPPING FROM ENTITY ).
+
+*    SELECT MAX( vbeln ) FROM zum_so_head
+*    INTO @DATA(lv_vbeln).
+*
+*    lv_vbeln = lv_vbeln + 1.
+
+    LOOP AT entities ASSIGNING FIELD-SYMBOL(<lfs_entities>).
+
+      IF NOT gt_so_head IS INITIAL.
+*        gt_so_head[ 1 ]-vbeln = lv_vbeln.
+
+        mapped-head = VALUE #( (
+                               %cid      = <lfs_entities>-%cid
+                               %key      = <lfs_entities>-%key
+                               %is_draft = <lfs_entities>-%is_draft
+                               ) ).
+      ENDIF.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD save_data.
+    IF NOT gt_so_head[] IS INITIAL.
+      MODIFY zum_so_head FROM TABLE @gt_so_head[].
+    ENDIF.
+
+    IF NOT gt_so_item[] IS INITIAL.
+      MODIFY zum_so_item FROM TABLE @gt_so_item[].
+    ENDIF.
+
+    IF gr_head_d IS NOT INITIAL.
+      DELETE FROM zum_so_head WHERE vbeln IN @gr_head_d.
+    ENDIF.
+
+    IF gr_item_d IS NOT INITIAL.
+      DELETE zum_so_item FROM TABLE gr_item_d.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD read_head.
+
+    SELECT zhd~* FROM zum_so_head AS zhd
+    INNER JOIN @keys AS im_keys
+    ON zhd~vbeln = im_keys~vbeln
+    INTO TABLE @DATA(lt_so_head).
+
+    result = CORRESPONDING #( lt_so_head ).
+
+  ENDMETHOD.
+
+  METHOD update_head.
+
+    DATA: lt_head_update   TYPE STANDARD TABLE OF zum_so_head,
+          lt_head_update_x TYPE STANDARD TABLE OF zcs_sale_ord_hd.
+
+    lt_head_update = CORRESPONDING #( entities MAPPING FROM ENTITY ).
+    lt_head_update_x = CORRESPONDING #( entities USING CONTROL ).
+
+    IF NOT lt_head_update IS INITIAL.
+
+      SELECT zhd~* FROM zum_so_head AS zhd
+      INNER JOIN @lt_head_update AS znew
+      ON zhd~vbeln = znew~vbeln
+      INTO TABLE @DATA(lt_so_head_old).
+
+    ENDIF.
+
+    gt_so_head = VALUE #(
+                          FOR x               = 1 WHILE x <= lines( lt_head_update )
+                          LET ls_control_flag = VALUE #( lt_head_update_x[ x ] OPTIONAL )
+                              ls_head_new     = VALUE #( lt_head_update[ x ] OPTIONAL )
+                              ls_head_old     = VALUE #( lt_so_head_old[ vbeln = ls_head_new-vbeln ] OPTIONAL )
+
+                          IN (                                           vbeln = ls_head_new-vbeln
+                                                                         vbtyp = COND #( WHEN ls_control_flag-vbtyp IS NOT INITIAL
+                                                                                         THEN ls_head_new-vbtyp ELSE ls_head_old-vbtyp )
+                                                                         auart = COND #( WHEN ls_control_flag-auart IS NOT INITIAL
+                                                                                         THEN ls_head_new-auart ELSE ls_head_old-auart )
+                                                                         augru = COND #( WHEN ls_control_flag-augru IS NOT INITIAL
+                                                                                         THEN ls_head_new-augru ELSE ls_head_old-augru )
+                                                                         vkorg = COND #( WHEN ls_control_flag-vkorg IS NOT INITIAL
+                                                                                         THEN ls_head_new-vkorg ELSE ls_head_old-vkorg )
+                                                                         vtweg = COND #( WHEN ls_control_flag-vtweg IS NOT INITIAL
+                                                                                         THEN ls_head_new-vtweg ELSE ls_head_old-vtweg )
+                                                                         spart = COND #( WHEN ls_control_flag-spart IS NOT INITIAL
+                                                                                         THEN ls_head_new-spart ELSE ls_head_old-spart ) )
+    ).
+
+  ENDMETHOD.
+
+  METHOD delete_head.
+
+    DATA: lt_header TYPE STANDARD TABLE OF zum_so_head.
+
+    lt_header = CORRESPONDING #( keys ).
+
+    gr_head_d = VALUE #( FOR ls_header IN lt_header (
+                         sign   = 'I'
+                         option = 'EQ'
+                         low    = ls_header-vbeln
+                         ) ).
+
+  ENDMETHOD.
+
+  METHOD rba_item.
+
+  ENDMETHOD.
+
+  METHOD cba_item.
+
+    gt_so_item = VALUE #( FOR ls_entities_cba IN entities_cba
+                          FOR ls_item_cba IN ls_entities_cba-%target
+                          LET ls_rap_item = CORRESPONDING zum_so_item( ls_item_cba )
+                          IN ( ls_rap_item ) ).
+
+    mapped-item = VALUE #( FOR i = 1 WHILE i <= lines( entities_cba )
+
+    LET lt_item = VALUE #( entities_cba[ 1 ]-%target OPTIONAL )
+
+    IN FOR j = 1 WHILE j <= lines( lt_item )
+
+    LET ls_curr_item = VALUE #( lt_item[ j ] OPTIONAL )
+    IN (
+        %cid = ls_curr_item-%cid
+        %key = ls_curr_item-%key
+        posnr = ls_curr_item-posnr  )  ).
+
+  ENDMETHOD.
+
+  METHOD earlynumbering_cba_item.
+
+    SELECT MAX( posnr )
+    FROM zum_so_item
+    WHERE vbeln = @( VALUE #( entities[ 1 ]-vbeln OPTIONAL ) )
+    INTO @DATA(lv_max_posnr).
+
+    lv_max_posnr += 1.
+
+    lv_max_posnr = |{ lv_max_posnr ALPHA = IN }|.
+
+    LOOP AT entities ASSIGNING FIELD-SYMBOL(<lfs_entities>).
+
+      LOOP AT <lfs_entities>-%target ASSIGNING FIELD-SYMBOL(<lfs_entity_target>).
+        mapped-item = VALUE #( (
+                               %cid      = <lfs_entity_target>-%cid
+                               %is_draft = <lfs_entity_target>-%is_draft
+                               vbeln     = <lfs_entity_target>-vbeln
+                               posnr     = lv_max_posnr
+                               ) ).
+      ENDLOOP.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD delete_item.
+
+    DATA: lt_item TYPE STANDARD TABLE OF zum_so_item.
+
+    lt_item = CORRESPONDING #( keys ).
+
+    gr_item_d = VALUE #( FOR ls_item IN lt_item (
+                         vbeln = ls_item-vbeln
+                         posnr = ls_item-posnr
+                         ) ).
+
+  ENDMETHOD.
+
+  METHOD update_item.
+
+    DATA: lt_item_update   TYPE STANDARD TABLE OF zum_so_item,
+          lt_item_update_x TYPE STANDARD TABLE OF zcs_sale_ord_it.
+
+    lt_item_update = CORRESPONDING #( entities MAPPING FROM ENTITY ).
+    lt_item_update_x = CORRESPONDING #( entities USING CONTROL ).
+
+    IF NOT lt_item_update IS INITIAL.
+
+      SELECT zhd~* FROM zum_so_item AS zhd
+      INNER JOIN @lt_item_update AS znew
+      ON zhd~vbeln = znew~vbeln
+      AND zhd~posnr = znew~posnr
+      INTO TABLE @DATA(lt_so_item_old).
+
+    ENDIF.
+
+    gt_so_item = VALUE #(
+                          FOR x               = 1 WHILE x <= lines( lt_item_update )
+                          LET ls_control_flag = VALUE #( lt_item_update_x[ x ] OPTIONAL )
+                              ls_item_new     = VALUE #( lt_item_update[ x ] OPTIONAL )
+                              ls_item_old     = VALUE #( lt_so_item_old[ vbeln        = ls_item_new-vbeln ] OPTIONAL )
+
+                          IN (                                           vbeln        = ls_item_new-vbeln
+                                                                         posnr        = ls_item_new-posnr
+                                                                         matnr        = COND #( WHEN ls_control_flag-matnr IS NOT INITIAL
+                                                                                                THEN ls_item_new-matnr ELSE ls_item_old-matnr )
+                                                                         matkl        = COND #( WHEN ls_control_flag-matkl IS NOT INITIAL
+                                                                                                THEN ls_item_new-matkl ELSE ls_item_old-matkl )
+                                                                         pstyv        = COND #( WHEN ls_control_flag-pstyv IS NOT INITIAL
+                                                                                                THEN ls_item_new-pstyv ELSE ls_item_old-pstyv )
+                                                                         posar        = COND #( WHEN ls_control_flag-posar IS NOT INITIAL
+                                                                                                THEN ls_item_new-posar ELSE ls_item_old-posar )
+                                                                         process_code = COND #( WHEN ls_control_flag-process_code IS NOT INITIAL
+                                                                                                THEN ls_item_new-process_code ELSE ls_item_old-process_code ) )
+    ).
+
+  ENDMETHOD.
+
+ENDCLASS.
