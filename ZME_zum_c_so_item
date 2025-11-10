@@ -51,19 +51,19 @@ annotate entity zum_c_so_item with
   ProcessCode;
 
   @UI.hidden: true
-  Createdby;
+  Createdby1;
 
   @UI.hidden: true
-  Createdat;
+  Createdat1;
 
   @UI.hidden: true
-  Lastchangedby;
+  Lastchangedby1;
 
   @UI.hidden: true
-  Lastchangedat;
+  Lastchangedat1;
 
   @UI.hidden: true
-  Locallastchangedat;
+  Locallastchangedat1;
   /* Associations */
   //_Head;
 
