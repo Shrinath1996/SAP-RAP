@@ -1,0 +1,73 @@
+unmanaged implementation in class zCL_um_i_so_head1 unique;
+strict ( 2 );
+with draft;
+
+define behavior for zum_i_so_head alias Head
+draft table zum_so_d_head
+early numbering
+lock master
+total etag Lastchanged_at
+authorization master ( instance )
+etag master Locallastchanged_at
+{
+  create;
+  update;
+  delete;
+  association _Item { create; with draft; }
+
+  field ( readonly ) Vbeln;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for zum_so_head
+    {
+      vbeln               = vbeln;
+      Vbtyp               = vbtyp;
+      auart               = auart;
+      augru               = augru;
+      vkorg               = vkorg;
+      vtweg               = vtweg;
+      spart               = spart;
+      Created_by          = createdby;
+      created_at          = createdat;
+      lastchanged_by      = lastchangedby;
+      lastchanged_at      = lastchangedat;
+      locallastchanged_at = locallastchangedat;
+    }
+
+}
+
+define behavior for zum_i_so_item alias Item
+draft table zum_so_d_item
+early numbering
+lock dependent by _Head
+authorization dependent by _Head
+etag master Locallastchangedat1
+
+{
+  update;
+  delete;
+  field ( readonly ) Vbeln, Posnr;
+  association _Head { with draft; }
+
+
+  mapping for zum_so_item
+    {
+      Vbeln               = vbeln;
+      Posnr               = posnr;
+      matnr               = matnr;
+      matkl               = matkl;
+      pstyv               = pstyv;
+      posar               = posar;
+      processcode         = process_code;
+      createdby1          = createdby;
+      Createdat1          = createdat;
+      lastchangedby1      = lastchangedby;
+      lastchangedat1      = lastchangedat;
+      locallastchangedat1 = locallastchangedat;
+    }
+}
