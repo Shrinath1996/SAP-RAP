@@ -12,10 +12,10 @@ define root view entity zum_i_so_head
       vkorg              as Vkorg,
       vtweg              as Vtweg,
       spart              as Spart,
-      createdby          as Createdby,
-      createdat          as Createdat,
-      lastchangedby      as Lastchangedby,
-      lastchangedat      as Lastchangedat,
-      locallastchangedat as Locallastchangedat,
+      createdby          as Created_by,
+      createdat          as Created_at,
+      lastchangedby      as Lastchanged_by,
+      lastchangedat      as Lastchanged_at,
+      locallastchangedat as Locallastchanged_at,
       _Item
 }
