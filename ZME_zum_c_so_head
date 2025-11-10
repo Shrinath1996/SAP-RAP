@@ -45,6 +45,7 @@ annotate entity zum_c_so_head with
 
   @UI: { lineItem:       [ { position: 50 } ],
         identification: [ { position: 50 } ] }
+ @Consumption.valueHelpDefinition: [{ entity : { element: 'SalesOrganization' , name: 'I_SALESORGANIZATION' }  }]
   Vkorg;
 
   @UI: { lineItem:       [ { position: 60 } ],
@@ -56,19 +57,19 @@ annotate entity zum_c_so_head with
   Spart;
 
   @UI.hidden: true
-  Createdby;
+  Created_by;
 
   @UI.hidden: true
-  Createdat;
+  Created_at;
 
   @UI.hidden: true
-  Lastchangedby;
+  Lastchanged_by;
 
   @UI.hidden: true
-  Lastchangedat;
+  Lastchanged_at;
 
   @UI.hidden: true
-  Locallastchangedat;
+  Locallastchanged_at;
 
 
   /* Associations */
