@@ -1,0 +1,231 @@
+CLASS lhc_head DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
+      IMPORTING keys REQUEST requested_authorizations FOR head RESULT result.
+
+    METHODS create FOR MODIFY
+      IMPORTING entities FOR CREATE head.
+
+    METHODS earlynumbering_create FOR NUMBERING
+      IMPORTING entities FOR CREATE head.
+
+    METHODS update FOR MODIFY
+      IMPORTING entities FOR UPDATE head.
+
+    METHODS delete FOR MODIFY
+      IMPORTING keys FOR DELETE head.
+
+    METHODS read FOR READ
+      IMPORTING keys FOR READ head RESULT result.
+
+    METHODS lock FOR LOCK
+      IMPORTING keys FOR LOCK head.
+
+    METHODS rba_item FOR READ
+      IMPORTING keys_rba FOR READ head\_item FULL result_requested RESULT result LINK association_links.
+
+    METHODS cba_item FOR MODIFY
+      IMPORTING entities_cba FOR CREATE head\_item.
+
+    METHODS earlynumbering_cba_item FOR NUMBERING
+      IMPORTING entities FOR CREATE head\_item.
+
+ENDCLASS.
+
+CLASS lhc_head IMPLEMENTATION.
+
+  METHOD get_instance_authorizations.
+  ENDMETHOD.
+
+  METHOD create.
+    zcl_buffer_so=>get_instance( )->create_head(
+      EXPORTING
+          entities = entities
+        CHANGING
+          mapped   = mapped
+          failed   = failed
+          reported = reported ).
+  ENDMETHOD.
+
+  METHOD earlynumbering_create.
+
+    zcl_buffer_so=>get_instance( )->earlynumbering_create_head(
+      EXPORTING
+        entities = entities
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported ).
+
+  ENDMETHOD.
+
+  METHOD update.
+
+    zcl_buffer_so=>get_instance( )->update_head(
+      EXPORTING
+        entities = entities
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported  ).
+
+  ENDMETHOD.
+
+  METHOD delete.
+
+    zcl_buffer_so=>get_instance( )->delete_head(
+      EXPORTING
+        keys     = keys
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported ).
+
+  ENDMETHOD.
+
+  METHOD read.
+
+    zcl_buffer_so=>get_instance( )->read_head(
+      EXPORTING
+        keys     = keys
+      CHANGING
+        result   = result
+        failed   = failed
+        reported = reported ).
+
+  ENDMETHOD.
+
+  METHOD lock.
+  ENDMETHOD.
+
+  METHOD rba_item.
+
+    zcl_buffer_so=>get_instance( )->rba_item(
+      EXPORTING
+        keys_rba          = keys_rba
+        result_requested  = result_requested
+      CHANGING
+        result            = result
+        association_links = association_links
+        failed            = failed
+        reported          = reported ).
+
+  ENDMETHOD.
+
+  METHOD cba_item.
+
+    zcl_buffer_so=>get_instance( )->cba_item(
+      EXPORTING
+        entities_cba = entities_cba
+      CHANGING
+        mapped       = mapped
+        failed       = failed
+        reported     = reported ).
+
+  ENDMETHOD.
+
+  METHOD earlynumbering_cba_item.
+
+    zcl_buffer_so=>get_instance( )->earlynumbering_cba_item(
+      EXPORTING
+        entities = entities
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lhc_item DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS update FOR MODIFY
+      IMPORTING entities FOR UPDATE item.
+
+    METHODS delete FOR MODIFY
+      IMPORTING keys FOR DELETE item.
+
+    METHODS read FOR READ
+      IMPORTING keys FOR READ item RESULT result.
+
+    METHODS rba_head FOR READ
+      IMPORTING keys_rba FOR READ item\_head FULL result_requested RESULT result LINK association_links.
+
+ENDCLASS.
+
+CLASS lhc_item IMPLEMENTATION.
+
+  METHOD update.
+
+    zcl_buffer_so=>get_instance( )->update_item(
+      EXPORTING
+        entities = entities
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported ).
+
+  ENDMETHOD.
+
+  METHOD delete.
+
+    zcl_buffer_so=>get_instance( )->delete_item(
+      EXPORTING
+        keys     = keys
+      CHANGING
+        mapped   = mapped
+        failed   = failed
+        reported = reported ).
+
+
+  ENDMETHOD.
+
+  METHOD read.
+  ENDMETHOD.
+
+  METHOD rba_head.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lsc_zum_i_so_head DEFINITION INHERITING FROM cl_abap_behavior_saver.
+  PROTECTED SECTION.
+
+    METHODS finalize REDEFINITION.
+
+    METHODS check_before_save REDEFINITION.
+
+    METHODS save REDEFINITION.
+
+    METHODS cleanup REDEFINITION.
+
+    METHODS cleanup_finalize REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_zum_i_so_head IMPLEMENTATION.
+
+  METHOD finalize.
+  ENDMETHOD.
+
+  METHOD check_before_save.
+  ENDMETHOD.
+
+  METHOD save.
+
+    zcl_buffer_so=>get_instance( )->save_data(
+      CHANGING
+        reported = reported ).
+
+  ENDMETHOD.
+
+  METHOD cleanup.
+  ENDMETHOD.
+
+  METHOD cleanup_finalize.
+  ENDMETHOD.
+
+ENDCLASS.
