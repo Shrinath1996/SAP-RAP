@@ -5,20 +5,24 @@
 define root view entity zum_c_so_head
   provider contract transactional_query
   as projection on zum_i_so_head
+  association [1] to I_SalesOrganization as _salesorg on $projection.Vkorg = _salesorg.SalesOrganization
   //composition[*] of child
 {
   key Vbeln,
       Vbtyp,
       Auart,
       Augru,
+      @Consumption.valueHelpDefinition: [{ entity : { element: 'SalesOrganization' , name: 'I_SALESORGANIZATION' } }]
       Vkorg,
       Vtweg,
       Spart,
-      Createdby,
-      Createdat,
-      Lastchangedby,
-      Lastchangedat,
-      Locallastchangedat,
+      Created_by,
+      Created_at,
+      Lastchanged_by,
+      Lastchanged_at,
+      Locallastchanged_at,
+      _salesorg,
       /* Associations */
       _Item : redirected to composition child zum_c_so_item
+
 }
