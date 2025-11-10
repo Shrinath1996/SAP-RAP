@@ -2,6 +2,7 @@
 @AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
 define structure zcs_sale_ord_hd {
 
+  vbeln              : xsdboolean;
   vbtyp              : xsdboolean;
   auart              : xsdboolean;
   augru              : xsdboolean;
