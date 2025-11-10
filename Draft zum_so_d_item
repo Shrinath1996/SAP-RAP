@@ -5,19 +5,19 @@
 @AbapCatalog.dataMaintenance : #RESTRICTED
 define table zum_so_d_item {
 
-  key mandt          : mandt not null;
-  key vbeln          : vbeln_va not null;
-  key posnr          : posnr_va not null;
-  matnr              : matnr;
-  matkl              : matkl;
-  pstyv              : pstyv;
-  posar              : posar;
-  processcode        : tdd_item_process_code;
-  createdby          : abp_creation_user;
-  createdat          : abp_creation_date;
-  lastchangedby      : abp_lastchange_user;
-  lastchangedat      : abp_lastchange_date;
-  locallastchangedat : abp_locinst_lastchange_date;
-  "%admin"           : include sych_bdl_draft_admin_inc;
+  key mandt           : mandt not null;
+  key vbeln           : vbeln_va not null;
+  key posnr           : posnr_va not null;
+  matnr               : matnr;
+  matkl               : matkl;
+  pstyv               : pstyv;
+  posar               : posar;
+  processcode         : tdd_item_process_code;
+  createdby1          : abp_creation_user;
+  createdat1          : abp_creation_date;
+  lastchangedby1      : abp_lastchange_user;
+  lastchangedat1      : abp_lastchange_date;
+  locallastchangedat1 : abp_locinst_lastchange_date;
+  "%admin"            : include sych_bdl_draft_admin_inc;
 
 }
