@@ -1,832 +1,403 @@
-
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-*&---
-*& Report YSHRI_TEST6
-*&--
+*&---------------------------------------------------------------------*
+*& Report YTEST_SHRI_CUSTOM_EXCEL
+*&---------------------------------------------------------------------*
 *&
-*&-
-REPORT yshri_test6.
+*&---------------------------------------------------------------------*
+REPORT ytest_shri_custom_excel.
+
 TYPES: BEGIN OF ts_download_temp,
-zinvoiceid
-zinvoicetype
-zfreightordinv
-companycode
-TYPE string,
-TYPE string,
-TYPE string,
-TYPE string,
-supplierinvoicetransaction type TYPE string,
-invoicingparty
-zinfoflovendor
-TYPE string,
-TYPE string,
-supplierinvoiceidbyinvcgparty TYPE string,
-zrequesterid
-TYPE string,
-documentdate
-TYPE string,
-documentcurrency
-TYPE string,
-invoicegrossamount
-TYPE string,
-zponumber_header
-TYPE string,
-zfreightorder
-TYPE string,
-zbol
-TYPE string,
-zprobill
-TYPE string,
-zwaybill
-TYPE string,
-unplanneddelivery cost taxcode
-TYPE string,
-zponumber_line
-TYPE string,
-zfreightorder_line
-TYPE string,
-zbol_line
-TYPE string,
-zprobill_line
-TYPE string,
-zwaybill_line
-TYPE string,
-zpoitemnum
-TYPE string,
-zpoquantity
-TYPE string,
-zpouom
-TYPE string,
-zponetprice
-TYPE string,
-glaccount
-TYPE string,
-supplierinvoiceitemtext
-TYPE string,
-costcenter
-TYPE string,
-wbselement
-TYPE string,
-debitcreditcode
-TYPE string,
-supplierinvoiceitemamount
-TYPE string,
-taxcode
-TYPE string,
-taxjurisdiction
-TYPE string,
-*
-END OF ts_download_temp.
-DATA: gt_data
-lt_final
-lt_blocks
-1s_formatting
-TYPE STANDARD TABLE OF ts_download_temp,
-TYPE if_salv_export_appendix=>yts_cell, TYPE if_salv_export_appendix=>yts_block, TYPE if_salv_export_appendix=>ys_cell_formatting,
-lo_table_row_descriptor TYPE REF TO cl_abap_structdescr, lo_source_table_descr TYPE REF TO cl_abap_tabledescr,
-Esc
-Fn
-4x
-av FF
-IDE
-F1
-F2
-F3
-HO
-F4
-F5
-F6
-D
-@
-#
-$
-LA
-%
-1
-2
-3
-4
-5€
-6
+         zinvoiceid                    TYPE string,
+         zinvoicetype                  TYPE string,
+         zfreightordinv                TYPE string,
+         companycode                   TYPE string,
+         supplierinvoicetransaction    TYPE string,
+         invoicingparty                TYPE string,
+         zinfoflovendor                TYPE string,
+         supplierinvoiceidbyinvcgparty TYPE string,
+         zrequesterid                  TYPE string,
+         documentdate                  TYPE string,
+         documentcurrency              TYPE string,
+         invoicegrossamount            TYPE string,
+         zponumber_header              TYPE string,
+         zfreightorder                 TYPE string,
+         zbol                          TYPE string,
+         zprobill                      TYPE string,
+         zwaybill                      TYPE string,
+         unplanneddeliverycosttaxcode  TYPE string,
+         zponumber_line                TYPE string,
+         zfreightorder_line            TYPE string,
+         zbol_line                     TYPE string,
+         zprobill_line                 TYPE string,
+         zwaybill_line                 TYPE string,
+         zpoitemnum                    TYPE string,
+         zpoquantity                   TYPE string,
+         zpouom                        TYPE string,
+         zponetprice                   TYPE string,
+         glaccount                     TYPE string,
+         supplierinvoiceitemtext       TYPE string,
+         costcenter                    TYPE string,
+         wbselement                    TYPE string,
+         debitcreditcode               TYPE string,
+         supplierinvoiceitemamount     TYPE string,
+         taxcode                       TYPE string,
+         taxjurisdiction               TYPE string,
+       END OF ts_download_temp.
 
+DATA: gt_data                 TYPE STANDARD TABLE OF ts_download_temp,
+      lt_final                TYPE if_salv_export_appendix=>yts_cell,
+      lt_blocks               TYPE if_salv_export_appendix=>yts_block,
+      ls_formatting           TYPE if_salv_export_appendix=>ys_cell_formatting,
+      lo_table_row_descriptor TYPE REF TO cl_abap_structdescr,
+      lo_source_table_descr   TYPE REF TO cl_abap_tabledescr,
+      1r_appendix             TYPE REF TO if_salv_export_appendix=>yts_block,
+      lo_xml_document         TYPE REF TO cl_xml_document,
+      lv_font_title           TYPE string,
+      lv_font_info            TYPE string,
+      lv_font_all             TYPE string,
+      lv_style_all            TYPE string,
+      lv_title_style          TYPE string,
+      lv_info_style           TYPE string,
+      lv_text_style           TYPE string,
+      lv_date_style           TYPE string,
+      lv_item                 TYPE i,
+      lv_file_filter          TYPE string,
+      lv_filename             TYPE string,
+      lv_path                 TYPE string,
+      lv_fullpath             TYPE string,
+      lv_length               TYPE i,
+      ev_user_action          TYPE i,
+      lt_bintab               TYPE solix_tab,
+      lv_date                 TYPE char10.
 
-
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-lo_source_table_descr
-1r_appendix
-lo_xml_document
-lv_font_title
-lv_font_info
-lv_font_all
-TYPE REF TO cl_abap_tabledescr,
-TYPE REF TO if_salv_export_appendix =>yts_block, TYPE REF TO cl_xml_document,
-TYPE string,
-TYPE string,
-TYPE string,
-lv_style_all
-TYPE string,
-lv_title_style
-TYPE string,
-lv_info_style
-TYPE string,
-lv_text_style
-TYPE string,
-lv_date_style
-TYPE string,
-lv_item
-TYPE i,
-lv_file_filter
-TYPE string,
-lv_filename
-TYPE string,
-lv_path
-TYPE string,
-lv_fullpath
-TYPE string,
-lv_length
-ev_user_action
-lt_bintab
-lv_date
-TYPE i, TYPE i,
-TYPE solix_tab, TYPE char10.
 START-OF-SELECTION.
-GET REFERENCE OF gt_data INTO DATA(lo_excel_structure_1).
-DATA(lo_itab_services)
-=
-cl_salv_itab_services->create_for_table_ref( lo_excel_structure_1 ). lo_source_table_descr ?= cl_abap_tabledescr=>describe_by_data_ref( lo_excel_structure_1 ). lo_table_row_descriptor ?= lo_source_table_descr->get_table_line_type().
-DATA(gt_field_lst)
-DATA(10_tool_xls) =
-=
-lo_table_row_descriptor->components[].
-cl_salv_export_tool_ats_xls=> create_for_excel_from_ats( = lo_itab_services
-io_itab_services io_source_struct_descr
-it_aggregation_rules
-it_grouping_rules
-=
-lo_table_row_descriptor
-= VALUE if_salv_service_types =>yt_aggregation_rule( )
-= VALUE if_salv_service_types =>yt_grouping_rule() ).
-DATA(lo_config) = lo_tool_xls->configuration().
-1s_formatting-horizontal_alignment = '04'. 1s_formatting-vertical_alignment = '03'.
-1s_formatting-is_bold
-= abap_true.
-1s_formatting-is_text_wrapping_enabled = abap_true.
-CALL FUNCTION 'HRGPBS_HESA_DATE_FORMAT'
-EXPORTING
-p_date
-= sy-datum
-IMPORTING
-datestring = lv_date.
-APPEND VALUE #( row_index
-=
-1 column_index =
-1 column_span = 2
-Esc
-ED
-Fn
-4×
-F1
-4
-F2
-IUE
-@ -
-»
-F3
-#
-F4
-tA
-DE
-F5
-F6
-DEL
-%
-A
-Mr.
 
+  GET REFERENCE OF gt_data INTO DATA(lo_excel_structure_1).
+  DATA(lo_itab_services) = cl_salv_itab_services=>create_for_table_ref( lo_excel_structure_1 ).
+  lo_source_table_descr ?= cl_abap_tabledescr=>describe_by_data_ref( lo_excel_structure_1 ).
+  lo_table_row_descriptor ?= lo_source_table_descr->get_table_line_type( ).
 
+  DATA(gt_field_lst) = lo_table_row_descriptor->components[].
 
+  DATA(lo_tool_xls) = cl_salv_export_tool_ats_xls=>create_for_excel_from_ats(
+  io_itab_services = lo_itab_services
+  io_source_struct_descr = lo_table_row_descriptor
+  it_aggregation_rules = VALUE if_salv_service_types=>yt_aggregation_rule( )
+  it_grouping_rules = VALUE if_salv_service_types=>yt_grouping_rule( ) ).
 
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-column_span = 2
-=
-APPEND VALUE #( row_index = 1 column_index = content_type = 'TEXT' value APPEND VALUE #( row_index = 2 column_index 'Excel Invoice Fiori Upload') TO 1t_final. = 1 column_span = 1 content_type formatting 'TEXT' ls_formatting value = 'Last Updated:') TO lt_final. APPEND VALUE #( row_index = 2 column_index = 2 column_span = 1 content_type = 'TEXT' 1s_formatting value = lv_date) TO 1t_final.
-formatting
-=
-=
-CLEAR 1s_formatting-background_color.
-1s_formatting-background_color = 'FF8EA9DB'. APPEND VALUE #( row_index = 4 column_index
-"'#8EA9DB'
-= 1 column_span = 18 content_type = 'TEXT' formatting = ls_formatting value = 'Header Data' ) TO lt_final.
-CLEAR 1s_formatting-background_color.
-ls_formatting-background_color = 'FFED7D31'. APPEND VALUE #( row_index formatting
-п
-'#ED7D31'
-= 4 column_index = 19 column_span = 17 content_type = 'TEXT' ls_formatting value = 'Line Item Detail') TO lt_final.
-=
-LOOP AT gt_field_lst INTO DATA(1s_field).
-CLEAR 1s_formatting-background_color. IF sy-tabix < 19.
-ls_formatting-background_color = 'FFEDF1F9'.
-ELSE.
-ls_formatting-background_color = 'FFFCE4D6'.
-ENDIF.
-APPEND VALUE #( row_index = 5 column_index = sy-tabix row_span = 2 column_span content_type = 'TEXT' formatting 1s_formatting value =
-= 1
-=
-ls_field-name ) TO lt_final.
-ENDLOOP.
-APPEND VALUE #( ordinal_number = 1 location = 'TOP' name = 'Template_Title' cells = lt_final ) TO lt_blocks.
-GET REFERENCE OF 1t_blocks INTO 1r_appendix.
-lo_config->if_salv_export_appendix~set_blocks ( 1r_appendix ).
-TRY.
-lo_tool_xls->read_result( IMPORTING content = DATA(1v_content) ). CATCH cx_salv_export_error.
-ENDTRY.
-TRY.
-DATA (10_xlsx_doc) = cl_xlsx_document => load_document ( lv_content ). CATCH cx_openxml_format.
-ENDTRY.
-*
-Η
-**
-*
--22122023-
-style.xml
-modify or add font into style.xml for setting font
-TRY.
-DATA (10_uri) = cl_openxml_parturi=>create_from_filename ( iv_filename = 'x1/styles.xml'). DATA(lo_stylepart) 10_xlsx_doc->get_part_by_uri( ir_parturi = lo_uri ).
-1
-Esc
-Fn
-EP
-4×
-av F
-ILE
-F1
-F2
-F3
-F4
-F5
-F6
-DEL
-Mr.
+  DATA(lo_config) = lo_tool_xls->configuration( ).
+  ls_formatting-horizontal_alignment = '04'.
+  ls_formatting-vertical_alignment = '03'.
+  ls_formatting-is_bold = abap_true.
+  ls_formatting-is_text_wrapping_enabled = abap_true.
 
+  CALL FUNCTION 'HRGPBS_HESA_DATE_FORMAT'
+    EXPORTING
+      p_date     = sy-datum
+    IMPORTING
+      datestring = lv_date.
 
+  APPEND VALUE #( row_index    = 1      column_index = 1 column_span = 2
+                  content_type = 'TEXT' value        = 'Excel Invoice Fiori Upload' ) TO lt_final.
+  APPEND VALUE #( row_index  = 2             column_index = 1 column_span = 1 content_type = 'TEXT'
+                  formatting = ls_formatting value        = 'Last Updated:' ) TO lt_final.
+  APPEND VALUE #( row_index  = 2             column_index = 2 column_span = 1 content_type = 'TEXT'
+                  formatting = ls_formatting value        = lv_date ) TO lt_final.
 
+  CLEAR ls_formatting-background_color.
+  ls_formatting-background_color = 'FF8EA9DB'. "'#8EA9DB'
+  APPEND VALUE #( row_index  = 4             column_index = 1 column_span = 18 content_type = 'TEXT'
+                  formatting = ls_formatting value        = 'Header Data' ) TO lt_final.
+  CLEAR ls_formatting-background_color.
+  ls_formatting-background_color = 'FFED7D31'. "'#ED7D31'
+  APPEND VALUE #( row_index  = 4             column_index = 19 column_span = 17 content_type = 'TEXT'
+                  formatting = ls_formatting value        = 'Line Item Detail' ) TO lt_final.
 
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-****
-DATA(lo_stylepart)
-= lo_xlsx_doc->get_part_by_uri( ir_parturi = lo_uri ). CREATE OBJECT 10_xml_document.
-lo_xml_document->parse_xstring( lo_stylepart->get_data( ) ). CATCH cx_openxml_format.
-CATCH cx_openxml_not_found. ENDTRY.
-"add font style
-DATA(lo_node) = 10_xml_document->find_node( name = 'fonts').
-**
-Π
-modify the count of fonts
+  LOOP AT gt_field_lst INTO DATA(ls_field).
+    CLEAR ls_formatting-background_color.
+    IF sy-tabix < 19.
+      ls_formatting-background_color = 'FFEDF1F9'.
+    ELSE.
+      ls_formatting-background_color = 'FFFCE4D6'.
+    ENDIF.
+    APPEND VALUE #( row_index    = 5      column_index = sy-tabix      row_span = 2 column_span = 1
+                    content_type = 'TEXT' formatting   = ls_formatting value    = ls_field-name ) TO lt_final.
+  ENDLOOP.
+
+  APPEND VALUE #( ordinal_number = 1 location = 'TOP' name = 'Template_Title' cells = lt_final ) TO lt_blocks.
+
+  GET REFERENCE OF lt_blocks INTO 1r_appendix.
+
+  lo_config->if_salv_export_appendix~set_blocks( 1r_appendix ).
+  TRY.
+      lo_tool_xls->read_result( IMPORTING content = DATA(lv_content) ).
+    CATCH cx_salv_export_error.
+  ENDTRY.
+
+  TRY.
+      DATA(lo_xlsx_doc) = cl_xlsx_document=>load_document( lv_content ).
+    CATCH cx_openxml_format.
+  ENDTRY.
+
+  "----------------22122023--------------------------------------
+*TRY.
+*  DATA(10_uri) = cl_openxml_parturi=>create_from_filename( iv_filename = 'x1/styles.xml').
+*  DATA(lo_stylepart) = l0_xlsx_doc->get_part_by_uri( ir_parturi = lo_uri ).
 *
+*  DATA(lo_stylepart) = lo_xlsx_doc->get_part_by_uri( ir_parturi = lo_uri ).
+*  CREATE OBJECT 10_xml_document.
+*  lo_xml_document->parse_xstring( lo_stylepart->get_data( ) ).
+*CATCH cx_openxml_format.
+*CATCH cx_openxml_not_found.
+*ENDTRY.
+
+*"add font style
+**modify the count of fonts
+*DATA(lo_node) = 10_xml_document->find_node( name = 'fonts').
+*DATA(lo_node_list) = lo_node->get_children( ).
+*DATA(10_node_ref_font) = lo_node_list->get_item( 0 ).
 *
+*DATA(lo_node_first_font) = lo_node_ref_font->clone( ).
+*DATA(10_node_rows) = lo_node_first_font->get_children( ).
+*DATA(10_node_first_element) = lo_node_rows->get_item( 0 ).
 *
-承
+*" Change proprety sz, set val to 22
+*DATA(10_attrs_map) = lo_node_first_element->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'val')->set_value( '22' ).
+*lv_font_title = lo_node->num_children( ).
+*CONDENSE lv_font_title.
+*lo_node->append_child( lo_node_first_font ).
 *
-*
-DATA(lo_node_list)
-=
-lo_node->get_children().
-DATA(10_node_ref_font) = lo_node_list->get_item( 0 ).
-DATA(lo_node_first_font) = lo_node_ref_font->clone( ). DATA(10_node_rows) = lo_node_first_font->get_children( ). DATA(10_node_first_element) = lo_node_rows->get_item( 0 ).
-*
-*
-Π
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-Change proprety sz, set val to 22
-DATA(10_attrs_map) lo_node_first_element->get_attributes(). lo_attrs_map->get_named_item_ns( name = 'val') ->set_value( '22' ). lv_font_title = lo_node->num_children( ).
-CONDENSE lv_font_title.
-lo_node->append_child( lo_node_first_font ).
-lo_node_ref_font = lo_node_list->get_item( 2 ). lo_node_first_font = lo_node_ref_font->clone( ). lo_node_rows = lo_node_first_font->get_children( ). lo_node_first_element = lo_node_rows->get_item( 0 ). lo_node_first_element->set_name( 'i' ). lv_font_info = lo_node->num_children ( ).
+*lo_node_ref_font = lo_node_list->get_item( 2 ).
+*lo_node_first_font = lo_node_ref_font->clone( ).
+*lo_node_rows = lo_node_first_font->get_children( ).
+*lo_node_first_element = lo_node_rows->get_item( 0 ).
+*lo_node_first_element->set_name( 'i' ).
+*lv_font_info = lo_node->num_children( ).
 ** CONDENSE lv_font_info.
+*lo_node->append_child( lo_node_first_font ).
 *
-lo_node->append_child( lo_node_first_font ).
-lv_font_all = lo_node->num_children( ).
+*lv_font_all = lo_node->num_children( ).
 * CONDENSE 1v_font_all.
-津
+
+*lo_attrs_map = lo_node->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'count' )->set_value( lv_font_all ).
 *
-lo_attrs_map = lo_node->get_attributes( ).
-lo_attrs_map->get_named_item_ns ( name = 'count' )->set_value( lv_font_all ).
 ** "add cell style
-name = 'cellXfs').
-lo_node = 10_xml_document->find_node( nam
+*lo_node = 10_xml_document->find_node( name = 'cellXfs').
 ** "add font style for Al
 *
 *
+*DATA(10_node_first_style) = lo_node->get_first_child( )->clone( ).
+*lo_attrs_map = lo_node_first_style->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'fontId' )->set_value( lv_font_title ).
+*lv_title_style = lo_node->num_children( ).
+*CONDENSE lv_title_style.
+*lo_node->append_child( lo_node_first_style ).
 *
+*CLEAR 10_node_first_style.
+*add style text format
+*lo_node_first_style = lo_node->get_first_child( )->clone( ).
+*lo_attrs_map = lo_node_first_style->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'numFmtId' )->set_value( '49' ).
+*lv_text_style = lo_node->num_children( ).
+*CONDENSE lv_text_style.
+*lo_node->append_child( lo_node_first_style ).
 *
-DATA(10_node_first_style) = lo_node->get_first_child()->clone( ).
-lo_attrs_map = lo_node_first_style->get_attributes().
-lo_attrs_map->get_named_item_ns ( name = 'fontId' )->set_value( lv_font_title ). lv_title_style =
-lo_node->num_children( ).
-* CONDENSE lv_title_style.
-lo_node->append_child( lo_node_first_style ).
+*CLEAR lo_node_first_style.
+*" add style Date format
+*lo_node_first_style = lo_node->get_first_child( )->clone( ).
+*lo_attrs_map = lo_node_first_style->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'numFmtId' )->set_value( '14' ).
+*lv_date_style = lo_node->num_children( ).
+*CONDENSE lv_date_style.
+*lo_node->append_child( lo_node_first_style ).
+*lv_style_all = lo_node->num_children( ).
+*CONDENSE lv_style_all.
 *
+*lo_attrs_map = lo_node->get_attributes( ).
+*lo_attrs_map->get_named_item_ns( name = 'count' )->set_value( lv_style_all ).
 *
-CLEAR 10_node_first_style.
-add style text format
-Esc
-Fn
-4x
-Mr. S
-Dave FF IDE
-@ -
-DELL
-F1
-F2
-F3
-F4
-F5
-F6
-F7
-+
-0
-
-
-
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
+*Apply above changes
+*lo_xml_document->render_2_xstring( IMPORTING stream = DATA(10_formarted) ).
+*lo_stylepart->feed_data( lo_formarted ).
 *
-add style text format
+*"worksheet.xml
+*" row/column modification
+*TRY.
+*  DATA(10_workbookpart) = lo_xlsx_doc->get_workbookpart( ).
+*CATCH cx_openxml_format.
+*CATCH cx_openxml_not_found.
+*ENDTRY.
 *
-=
-=
+*TRY.
+*  DATA(10_wordsheetparts) = lo_workbookpart->get_worksheetparts( ).
+*CATCH cx_openxml_format.
+*ENDTRY.
 *
-lo_node_first_style lo_node->get_first_child()->clone().
-lo_attrs_map
-lo_node_first_style->get_attributes().
-lo_attrs_map->get_named_item_ns( name = 'numFmtId' )->set_value( '49' ). lv_text_style= lo_node->num_children( ).
-CONDENSE lv_text_style.
-lo_node->append_child( lo_node_first_style ).
-CLEAR lo_node_first_style.
+*DATA(10_wordsheetpart) = lo_wordsheetparts->get_part( 0 ).
+*DATA(10_sheet_content) = lo_wordsheetpart->get_data( ).
 *
-" add style Date format
+* CREATE OBJECT 10_xml_document.
+*10_xml_document->parse_xstring( lo_sheet_content ).
 *
-lo_node_first_style =
-lo_node->get_first_child()->clone().
+*row index start from 0, if input nothing, the row will be ignored from index
+*lo_node = lo_xml_document->find_node( name = 'sheetData' ).
+*lo_node_rows = lo_node->get_children( ).
 *
+*hide structure name because end user can't understand technical field name
+  "hide header structure name from template doc
+*lo_node = lo_node_rows->get_item( 3 ).
+*lo_attrs_map = lo_node->get_attributes( ).
+** "reference node 'r'
+*DATA(lo_node_attr) = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 'hidden' ).
+*lo_node_attr->set_value( '0').
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
 *
-*
-*
-lo_attrs_map = lo_node_first_style->get_attributes().
-lo_attrs_map->get_named_item_ns ( name = 'numFmtId' )->set_value( '14' ). lv_date_style = lo_node->num_children().
-CONDENSE lv_date_style.
-lo_node->append_child( lo_node_first_style ).
-lv_style_all = lo_node->num_children().
-*
-CONDENSE lv_style_all.
-*
-*
-lo_attrs_map = lo_node->get_attributes().
-lo_attrs_map->get_named_item_ns( name = 'count' )->set_value( lv_style_all ).
-11
-Apply above changes
-lo_xml_document->render_2_xstring( IMPORTING stream = DATA (10_formarted) ). lo_stylepart->feed_data( lo_formarted ).
-*
-*
-*
-"worksheet.xml
-" row/column modification
-TRY.
-DATA(10_workbookpart) CATCH cx_openxml_format.
-=
-וו
-T
-lo_xlsx_doc->get_workbookpart().
-*
-CATCH cx_openxml_not_found.
-*
-ENDTRY.
-*
-*
-*
-*
-*
-TRY.
-DATA(10_wordsheetparts) = lo_workbookpart->get_worksheetparts( ). CATCH cx_openxml_format.
-ENDTRY.
-DATA(10_wordsheetpart) = lo_wordsheetparts->get_part( 0 ). DATA(10_sheet_content) = lo_word sheetpart->get_data( ).
-** CREATE OBJECT 10_xml_document.
-*
-*
-10_xml_document->parse_xstring( lo_sheet_content ).
-*
-11
-row index start from 0, if input nothing, the row will be ignored from index
-* lo_node = lo_xml_document->find_node( name = 'sheetData' ).
-*
-lo_node_rows = lo_node->get_children( ).
-*
-11
-hide structure name because end user can't understand technical field name
-aya FF IDE
-M
-D
-Esc
-Fn
-F1
-F2
-F3
-F4
-F5
-F6
-#
-A
-ds
-%
-Λ
-
-
-
-
-
-*
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-*
-IT
-hide structure name because end user can't understand technical field name "hide header structure name from template doc
-lo_node = lo_node_rows->get_item( 3 ).
-lo_attrs_map = lo_node->get_attributes( ).
-Π
-reference node 'r'
-DATA(lo_node_attr)
-=
-lo_attrs_map->get_named_item_ns ( name = 'r' )->clone().
-lo_node_attr->set_name( 'hidden' ).
-lo_node_attr->set_value( '0').
-lo_attrs_map->set_named_item_ns ( node = lo_node_attr ).
-*
-*
-*
-T1
-*
-Π
-*
-*
-set height of row
-adjust the height of row6: label row
-lo_node = lo_node_rows->get_item( lv_item ). "get_item( 4 ).
-lo_attrs_map = lo_node->get_attributes().
+*set height of row
+*adjust the height of row6: label row
+*lo_node = lo_node_rows->get_item( lv_item ). "get_item( 4 ).
+*lo_attrs_map = lo_node->get_attributes( ).
 * "reference node 'r'
-lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
-lo_node_attr->set_name( 'ht' ).
+*lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 'ht' ).
+*lo_node_attr->set_value( '45' ).
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+*reference node 'r'
+*lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 'customHeight' ).
+*lo_node_attr->set_value( '1' ).
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+** "reference node 'r'
+*lo_node_attr->set_value( '1' ).
+*lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 'customFormat' ).
+*lo_node_attr->set_value( '1' ).
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
 *
+*reference node 'r'
+*lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 's' ).
+*lo_node_attr->set_value( '7' ).
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
 *
-*
-*
-IT
-*
-*
-*
-lo_node_attr->set_value( '45' ).
-lo_attrs_map->set_named_item_ns ( node = lo_node_attr ).
-reference node 'r'
-lo_node_attr
-=
-lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
-lo_node_attr->set_name( 'customHeight' ).
-lo_node_attr->set_value( '1' ).
-lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
-* "reference node 'r'
-lo_node_attr->set_value( '1' ).
-*
-*
-lo_node_attr = lo_attrs_map->get_named_item_ns( name lo_node_attr->set_name( 'customFormat' ).
-= 'r')->clone( ).
-*
-*
-*
-reference node 'r'
-*
-*
-*
-*
-*
-*
-lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
-lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
-lo_node_attr->set_name( 's' ).
-lo_node_attr->set_value( '7' ).
-lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
-adjust the height of title rowl, default height is 15
+*adjust the height of title rowl, default height is 15
 * lo_node = lo_node_rows->get_item( 0 ).
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-lo_attrs_map
-=
-lo_node->get_attributes().
-reference node 'r'
-lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ). lo_node_attr->set_name( 'ht').
-lo_node_attr->set_value( '30' ).
-lo_attrs_map->set_named_item_ns ( node = lo_node_attr ).
-п
-reference node 'r'
-lo_node_attr
-=
-lo_attrs_map->get_named_item_ns ( name = 'r' )->clone().
-lo_node_attr->set_name( 'customHeight' ).
-lo_node_attr->set_value( '1').
-lo_attrs_map->set_named_item_ns ( node = lo_node_attr ).
-lo_node = lo_node_rows->get_item( lv_item ).
-lo_node_list
-=
-lo_node->get_children().
-Esc
-Fn
-F1
-Hava Fi
-IUE
-@ -
-D
-F2
-F3
-F4
-DE
-F5
-F6
+* lo_attrs_map = lo_node->get_attributes( ).
+**reference node 'r'
+*lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone( ).
+*lo_node_attr->set_name( 'ht').
+*lo_node_attr->set_value( '30' ).
+*lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+*  ""reference node 'r'
+*  lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'r' )->clone().
+*  lo_node_attr->set_name( 'customHeight' ).
+*  lo_node_attr->set_value( '1').
+*  lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+*  lo_node = lo_node_rows->get_item( lv_item ).
+*  lo_node_list = lo_node->get_children( ).
 
+*lo_node_list = lo_node->get_children( ).
+* "change a1 cell font
+*  lo_attrs_map = lo_node_list->get_item( lv_item )->get_attributes( ).
+*  lo_attrs_map->get_named_item_ns( name = 's')->set_value( lv_title_style ).
+*  CLEAR 10_node.
+*
+**  change special column default format
+*  lo_node = lo_xml_document->find_node( name = 'cols' ).
+*  lo_node_rows = lo_node->get_children( ).
+**  change col c width
+**
+*  lo_node = lo_node_rows->get_item( lv_item ).
+*  lo_attrs_map = lo_node->get_attributes( ).
+*  lo_node_attr = lo_attrs_map->get_named_item_ns( name = 'min' )->clone( ).
+*
+*  lo_node_attr->set_name( 'customWidth' ).
+*  lo_node_attr->set_value( '1' ).
+*  lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+*
+*  lo_attrs_map->get_named_item_ns( name = 'min' )->clone( ).
+*  lo_node_attr = lo_node_attr->set_name( 'width' ).
+*  lo_node_attr->set_value( '30').
+* lo_attrs_map->set_named_item_ns( node = lo_node_attr ).
+*
+* it apply above changes
+*  lo_xml_document->render_2_xstring( IMPORTING stream = lo_formarted ).
+*  lo_wordsheetpart->feed_data( lo_formarted ).
 
+  "--------------22122023--------------------------
 
-*
-*
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-*
-*
-*
-*
-lo_node_list = lo_node->get_children().
-"1
-Change A1 cell font
-lo_attrs_map = lo_node_list->get_item( lv_item )->get_attributes().
-lo_attrs_map->get_named_item_ns ( name
-CLEAR 10_node.
-П
-Change special column default format lo_node =
-= 's') ->set_value( lv_title_style ).
-lo_xml_document->find_node ( name = 'cols' ).
-lo_node_rows = lo_node->get_children( ). Change Col C Width
-*
-Π
-*
-*
-*
-lo_node =
-lo_node_rows->get_item( lv_item ).
-lo_attrs_map = lo_node->get_attributes().
-lo_node_attr
-= lo_attrs_map->get_named_item_ns( name
-= 'min' )->clone( ).
-*
-*
-lo_node_attr->set_name( 'customWidth' ). lo_node_attr->set_value( '1').
-*
-lo_attrs_map->set_named_item_ns ( node =
-lo_node_attr ).
-*
-*
-lo_node_attr
-=
-*
-lo_node_attr->set_name( 'width' ).
-*
-lo_node_attr->set_value( '30').
-*
-*
-IT
-Apply above changes
-*
-*
-lo_attrs_map->get_named_item_ns ( name = 'min' )->clone( ).
-lo_attrs_map->set_named_item_ns ( node = lo_node_attr ).
-lo_xml_document->render_2_xstring( IMPORTING stream =
-lo_wordsheetpart->feed_data( lo_formarted ).
-lo_formarted ).
-TRY.
-DATA(ev_target_doc)
--22122023--
-=
-lo_xlsx_doc->get_package_data( ).
-CATCH cx_openxml_format.
-ENDTRY.
-CONCATENATE 'Create custom excel' '_' sy-datum '_' sy-uzeit INTO lv_filename.
-cl_gui_frontend_services->file_save_dialog(
-EXPORTING
-default_extension
-CHANGING
-default_file_name
-file_filter
-filename
-path
-fullpath
-user_action
-EXCEPTIONS
-= 'xlsx' "lv_default_extension
-= lv_filename "iv_default_filename
-E
-lv_file_filter
-= lv_filename
-= lv_path
-=
-lv_fullpath
-= ev_user_action
-cntl_error
-error_no_gui
-not_supported_by_gui
-= 1
-= 2
-= 3
-invalid_default_file_name = 4
-OTHERS
-= 5).
-Daya F IDE
-"Control error
-"
-No GUI available
-GUI does not support this
-Π
-Invalid default file name
-Esc
-Fn
-F1
-F2
-F3
-어
-F4
-DE
-F5
-F6
-M
-DE
+  TRY.
+      DATA(ev_target_doc) = lo_xlsx_doc->get_package_data( ).
+    CATCH cx_openxml_format.
+  ENDTRY.
 
+  CONCATENATE 'Create custom excel' '_' sy-datum '_' sy-uzeit INTO lv_filename.
 
+  cl_gui_frontend_services=>file_save_dialog(
+  EXPORTING
+    default_extension         = 'xlsx'           " Default Extension
+    default_file_name         = lv_filename      " Default File Name
+    file_filter               = lv_file_filter   " File Type Filter Table
+  CHANGING
+    filename                  = lv_filename      " File Name to Save
+    path                      = lv_path          " Path to File
+    fullpath                  = lv_fullpath      " Path + File Name
+    user_action               = ev_user_action   " User Action (C Class Const ACTION_OK, ACTION_OVERWRITE etc)
+  EXCEPTIONS
+    cntl_error                = 1                " Control error
+    error_no_gui              = 2                " No GUI available
+    not_supported_by_gui      = 3                " GUI does not support this
+    invalid_default_file_name = 4                " Invalid default file name
+    OTHERS                    = 5 ).
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*   WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
 
-create custom xlsx file report.txt - Notepad
-File Edit Format View Help
-path fullpath
-user_action
-EXCEPTIONS
-cntl_error
-error_no_gui
-=
-lv_path
-= lv_fullpath
-= ev_user_action
-= 1
-= 2
-= 3
-not_supported_by_gui
-invalid_default_file_name = 4
-OTHERS
-=
-= 5).
-"Control error
-Π
-"
-No GUI available
-GUI does not support this
-Invalid default file name
-CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
-EXPORTING
-buffer
-IMPORTING
-= ev_target_doc "ms_spreadsheet_content-content
-output_length = lv_length
-TABLES
-binary_tab = lt_bintab.
-cl_gui_frontend_services->gui_download(
-EXPORTING
-bin_filesize
-filename
-filetype
-CHANGING
-data_tab
-= lv_length = lv_fullpath
-= 'BIN'
-= lt_bintab
-EXCEPTIONS
-file_write_error
-= 1
-no_batch
-= 2
-gui_refuse_filetransfer = 3
-invalid_type
-= 4
-no_authority
-= 5
-unknown_error
-= 6
-header_not_allowed
-= 7
-separator_not_allowed = 8
-filesize_not_allowed
-"File length for binary files
-11
-Name of file
-"File type (ASCII, binary ...)
-11
-"Transfer table
-Cannot write to file
-"Cannot execute front-end function in background
-Incorrect Front End
-Invalid value for parameter FILETYPE
-"No Download Authorization
-"Unknown error
-"Invalid header
-"Invalid separator
-11
-Invalid file size
-Header information currently restricted to 1023 bytes "Cannot create DataProvider
-"Error Sending Data with DataProvider
-= 9
-header_too_long
-= 10
-II
-dp_error_create
-= 11
-dp_error_send
-= 12
-dp_error_write
-= 13
-"
-Error Writing Data with DataProvider
-unknown_dp_error
-= 14
-"
-Error when calling data provider
-access_denied
-= 15
-dp_out_of_memory
-= 16
-disk_full
-= 17
-Π
-dp_timeout
-= 18
-"Access to file denied.
-"Not enough memory in data provider
-Storage medium is full.
-"Data provider timeout
-file_not_found
-dataprovider_exception = 20
-control_flush_error
-= 21
-not_supported_by_gui = 22
-error_no_gui
-= 23
-= 19
-It
-Could not find file
-(1
-General Exception Error in DataProvider
-11
-Error in Control Framework
-"1
-GUI does not support this
-"GUI not available
-OTHERS
-= 24 ).
-Esc
-Fn
-4x
-My FF
-IDE
-C -
-D
-F1
-F2
-›
-F3
-F4
-DE
-F5
-F6
-M
+  CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+    EXPORTING
+      buffer        = ev_target_doc "ms_spreadsheet_content-content
+    IMPORTING
+      output_length = lv_length
+    TABLES
+      binary_tab    = lt_bintab.
+
+  cl_gui_frontend_services=>gui_download(
+    EXPORTING
+      bin_filesize              = lv_length             " File length for binary files
+      filename                  = lv_fullpath           " Name of file
+      filetype                  = 'BIN'                 " File type (ASCII, binary ...)
+    CHANGING
+      data_tab                  = lt_bintab             " Transfer table
+    EXCEPTIONS
+      file_write_error          = 1                    " Cannot write to file
+      no_batch                  = 2                    " Front-End Function Cannot Be Executed in Backgrnd
+      gui_refuse_filetransfer   = 3                    " Incorrect Front End
+      invalid_type              = 4                    " Invalid value for parameter FILETYPE
+      no_authority              = 5                    " No Download Authorization
+      unknown_error             = 6                    " Unknown error
+      header_not_allowed        = 7                    " Invalid header
+      separator_not_allowed     = 8                    " Invalid separator
+      filesize_not_allowed      = 9                    " Invalid file size
+      header_too_long           = 10                   " Header information currently restricted to 1023 bytes
+      dp_error_create           = 11                   " Cannot create DataProvider
+      dp_error_send             = 12                   " Error Sending Data with DataProvider
+      dp_error_write            = 13                   " Error Writing Data with DataProvider
+      unknown_dp_error          = 14                   " Error when calling data provider
+      access_denied             = 15                   " Access to File Denied
+      dp_out_of_memory          = 16                   " Not Enough Memory in DataProvider
+      disk_full                 = 17                   " Storage Medium full
+      dp_timeout                = 18                   " Timeout of DataProvider
+      file_not_found            = 19                   " Could not find file
+      dataprovider_exception    = 20                   " General Exception Error in DataProvider
+      control_flush_error       = 21                   " Error in Control Framework
+      not_supported_by_gui      = 22                   " GUI does not support this
+      error_no_gui              = 23                   " GUI not available
+      OTHERS                    = 24 ).
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*   WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+  "--------------------------------------------------
